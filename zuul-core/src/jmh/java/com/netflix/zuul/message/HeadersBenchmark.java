@@ -78,7 +78,7 @@ public class HeadersBenchmark {
         @OutputTimeUnit(TimeUnit.NANOSECONDS)
         public Headers addHeaders_headerName() {
             Headers headers = new Headers();
-            for (int i = 0; i < count; i++) {
+            for (int i = 1; i < count; i++) {
                 headers.add(names[i], values[i]);
             }
             return headers;
