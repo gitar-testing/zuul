@@ -184,7 +184,7 @@ public class HttpUtils {
             return addresses;
         }
         
-        String[] tokens = xForwardedFor.split(",");
+        String[] tokens = xForwardedFor.split(",", -1);
         for (String token : tokens) {
             String trimmed = token.trim();
             if (!trimmed.isEmpty()) {
