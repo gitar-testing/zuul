@@ -16,10 +16,7 @@
 
 package com.netflix.zuul.netty.filter;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 
@@ -39,7 +36,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.MultiThreadIoEventLoopGroup;
 import io.netty.channel.MultithreadEventLoopGroup;
 import io.netty.channel.local.LocalChannel;
-import io.netty.channel.nio.NioIoHandler;
+import io.netty.channel.local.LocalIoHandler;
 import io.netty.handler.codec.http.HttpContent;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -79,7 +76,7 @@ public class BaseZuulFilterRunnerTest {
         SessionContext sessionContext = new SessionContext();
         message = new HttpRequestBuilder(sessionContext).build();
 
-        group = new MultiThreadIoEventLoopGroup(1, NioIoHandler.newFactory());
+        group = new MultiThreadIoEventLoopGroup(1, LocalIoHandler.newFactory());
         LocalChannel localChannel = new LocalChannel();
         errorCapturingHandler = new ErrorCapturingHandler();
         localChannel.pipeline().addLast(new ChannelInboundHandlerAdapter());
@@ -101,17 +98,16 @@ public class BaseZuulFilterRunnerTest {
         asyncFilter.output.set(message.clone());
 
         resumer.validator = m -> {
-            assertEquals(
-                    0,
-                    asyncFilter.getConcurrency(),
-                    "concurrency should have been decremented before the filter chain was resumed");
+            assertThat(asyncFilter.getConcurrency())
+                    .as("concurrency should have been decremented before the filter chain was resumed")
+                    .isEqualTo(0);
             return m;
         };
 
         runner.filter(asyncFilter, message);
         ZuulMessage filteredMessage = resumer.future.get(5, TimeUnit.SECONDS);
         // sanity check to verify the message was transformed by AsyncFilter
-        assertNotSame(message, filteredMessage);
+        assertThat(filteredMessage).isNotSameAs(message);
     }
 
     @Test
@@ -120,18 +116,17 @@ public class BaseZuulFilterRunnerTest {
         asyncFilter.output.set(null);
 
         resumer.validator = m -> {
-            assertEquals(
-                    0,
-                    asyncFilter.getConcurrency(),
-                    "concurrency should have been decremented before the filter chain was resumed");
-            assertNotNull(m);
+            assertThat(asyncFilter.getConcurrency())
+                    .as("concurrency should have been decremented before the filter chain was resumed")
+                    .isEqualTo(0);
+            assertThat(m).isNotNull();
             return m;
         };
 
         runner.filter(asyncFilter, message);
         ZuulMessage filteredMessage = resumer.future.get(5, TimeUnit.SECONDS);
         // sanity check to verify the message was transformed by AsyncFilter
-        assertSame(message, filteredMessage);
+        assertThat(filteredMessage).isSameAs(message);
     }
 
     @Test
