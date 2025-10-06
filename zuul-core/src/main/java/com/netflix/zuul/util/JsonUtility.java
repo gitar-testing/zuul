@@ -156,7 +156,7 @@ public class JsonUtility {
      * @return escaped string safe for JSON
      */
     public static String escapeJsonString(String input) {
-        if (input == null || input == "") {
+        if (input == null || input.isEmpty()) {
             return "";
         }
         
