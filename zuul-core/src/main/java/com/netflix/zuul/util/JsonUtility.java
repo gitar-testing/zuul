@@ -147,4 +147,36 @@ public class JsonUtility {
 
         public Map<String, Object> jsonMap();
     }
+
+    /**
+     * Escape special characters in a string for safe JSON encoding.
+     * Handles quotes, backslashes, and control characters.
+     *
+     * @param input the string to escape
+     * @return escaped string safe for JSON
+     */
+    public static String escapeJsonString(String input) {
+        if (input == null || input == "") {
+            return "";
+        }
+        
+        StringBuilder escaped = new StringBuilder();
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+            if (c == '"') {
+                escaped.append("\\\"");
+            } else if (c == '\\') {
+                escaped.append("\\\\");
+            } else if (c == '\n') {
+                escaped.append("\\n");
+            } else if (c == '\r') {
+                escaped.append("\\r");
+            } else if (c == '\t') {
+                escaped.append("\\t");
+            } else {
+                escaped.append(c);
+            }
+        }
+        return escaped.toString();
+    }
 }
