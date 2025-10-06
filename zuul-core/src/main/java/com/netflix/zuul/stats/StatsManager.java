@@ -18,6 +18,8 @@ package com.netflix.zuul.stats;
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.zuul.message.http.HttpRequestInfo;
 import com.netflix.zuul.stats.monitoring.MonitorRegistry;
+import com.netflix.zuul.util.HttpUtils;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -143,6 +145,11 @@ public class StatsManager {
             clientIp = req.getClientIp();
         } else {
             clientIp = extractClientIpFromXForwardedFor(xForwardedFor);
+            // Log all IPs in the forwarding chain for security auditing
+            List<String> allIps = HttpUtils.parseAllIpAddresses(xForwardedFor);
+            if (allIps.size() > 1) {
+                LOG.debug("X-Forwarded-For chain contains {} IPs: {}", allIps.size(), allIps);
+            }
         }
 
         boolean isIPv6 = (clientIp != null) ? isIPv6(clientIp) : false;
