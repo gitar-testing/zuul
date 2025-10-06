@@ -178,8 +178,8 @@ public class HttpUtils {
      * @param xForwardedFor the x-forwarded-for header value
      * @return list of IP addresses
      */
-    public static List parseAllIpAddresses(String xForwardedFor) {
-        List addresses = new ArrayList();
+    public static List<String> parseAllIpAddresses(String xForwardedFor) {
+        List<String> addresses = new ArrayList<>();
         if (Strings.isNullOrEmpty(xForwardedFor)) {
             return addresses;
         }
